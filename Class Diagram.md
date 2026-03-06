@@ -1,12 +1,12 @@
 # Class Diagram
 
-``` mermaid
+```mermaid
 classDiagram
-    App --> FlightUI
-    FlightUI -- Flight
+    App  -->  FlightUI
+    FlightUI  --  Flight
 
     App --> PassengerUI
-    PassengerUI -- Passenger
+    PassengerUI <-- Passenger
 
     App --> Database
 
@@ -30,7 +30,7 @@ classDiagram
         +addFlight()
         +removePlane()
         +removeRoute()
-        +remoteFlight()
+        +removeFlight()
     }
 
     class PassengerUI {
@@ -41,25 +41,25 @@ classDiagram
     }
 
     class Passenger {
-        -int passengerID
-        -String Name
-        -String Address
-        -double money
+        - passengerID : int
+        - name : String
+        - address : String
+        - money : double
     }
 
     class Plane {
-        -int planeID
-        -int firstClassSeats
-        -int coachSeats
-        -int economySeats
+        - planeID : int
+        - firstClassSeats : int
+        - coachSeats : int
+        - economySeats : int
         +getSeats()
     }
 
     class Ticket {
         <<abstract>>
-        -int ticketID
-        -double price
-        -String status
+        - ticketID : int
+        - price : double
+        - status : String
         +getTicketID()
         +getClass()
         +book()
@@ -69,17 +69,17 @@ classDiagram
     }
 
     class Flight {
-        -int flightID
-        -int deptTime
-        -int arriveTime
+        - flightID : int
+        - deptTime : int
+        - arriveTime : int
         +getDeparture()
         +seatsFree()
     }
 
     class Route {
-        -int RouteID
-        +String fromAirport
-        +String toAirport
+        - RouteID : int
+        - fromAirport : String
+        - toAirport : String
     }
 
     class FirstClass {

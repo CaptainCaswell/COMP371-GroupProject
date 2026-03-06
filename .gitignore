@@ -1,2 +1,9 @@
+# Database
 airline.db
+
+# VS Code
 launch.json
+.vscode/
+
+# Maven
+target/

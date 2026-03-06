@@ -3,6 +3,7 @@ package com.airline;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Database {
     private static Database instance;
@@ -38,6 +39,46 @@ public class Database {
     }
 
     public void seed() {
-        
+        createTables();
+
+        new Route( "YVR", "YXX" ).save();
+
+        System.out.println( "Done\n" );
+
+    }
+
+    private void dropTable( String tableName ) {
+        try {
+            String command = "DROP TABLE " + tableName;
+
+            Statement stmt = conn.createStatement();
+            stmt.execute( command );
+        } catch ( Exception e ) {
+            // Do nothing, table doesn't exist
+        }
+    }
+
+    private void createTables() {
+        dropTable( "Planes" );
+
+        // Routes
+        try {
+            String command = "CREATE TABLE Routes (RouteID INTEGER KEY INCREMENT, toAirport TEXT, fromAirport)";
+
+            Statement stmt = conn.createStatement();
+            stmt.execute( command );
+        } catch ( Exception e) {
+            System.out.println( "Error while creating Routes table: " + e );
+        }
+
+        // Planes
+        try {
+            String command = "CREATE TABLE Planes (tailNumber TEXT KEY, firstClassSeats INTEGER, coachSeats INTEGER, economySeats INTEGER)";
+
+            Statement stmt = conn.createStatement();
+            stmt.execute( command );
+        } catch ( Exception e) {
+            System.out.println( "Error while creating Planes table: " + e );
+        }
     }
 }
