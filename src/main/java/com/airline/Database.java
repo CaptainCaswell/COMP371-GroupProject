@@ -42,6 +42,7 @@ public class Database {
         createTables();
 
         new Route( "YVR", "YXX" ).save();
+        new Plane("F4F93L",40, 60, 120).insertPlane();
 
         System.out.println( "Done\n" );
 
