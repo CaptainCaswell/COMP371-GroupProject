@@ -9,10 +9,12 @@ public class Route {
     private int routeID;
     private String fromAirport;
     private String toAirport;
+    private int distance;
 
-    public Route( String fromAirport, String toAirport) {
+    public Route( String fromAirport, String toAirport, int distance) {
         this.fromAirport = fromAirport;
         this.toAirport = toAirport;
+        this.distance = distance;
     }
 
     public void save() {
@@ -41,5 +43,13 @@ public class Route {
             System.out.println( "Error inserting route: " + e );
         }
 
+    }
+
+    public int getID() {
+        return routeID;
+    }
+
+    public int getDistance() {
+        return distance;
     }
 }

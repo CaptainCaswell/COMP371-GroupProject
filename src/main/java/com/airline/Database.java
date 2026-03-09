@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 
 public class Database {
     private static Database instance;
@@ -41,7 +42,17 @@ public class Database {
     public void seed() {
         createTables();
 
-        new Route( "YVR", "YXX" ).save();
+        Route yvrTOyxx = new Route( "YVR", "YXX", 300 );
+        yvrTOyxx.save();
+
+        Plane a350 = new Plane(path, 300, 20, 40, 80 );
+        a350.save();
+
+        Flight flight1 = new Flight( yvrTOyxx, a350, LocalDateTime.parse( "2026-05-15T08:00" ), 500, 250, 125 );
+
+        Passenger ryan = new Passenger( "Ryan Caswell", 1000 );
+
+        FirstClassTicket ryanTicket = new FirstClassTicket( flight1, ryan );
 
         System.out.println( "Done\n" );
 
