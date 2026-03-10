@@ -20,11 +20,25 @@ public class Flight {
     private float coachCost;
     private float economyCost;
 
+    // New
     public Flight( Route route, Plane plane, LocalDateTime deptTime, float firstClassCost, float coachCost, float economyCost ) {
         this.route = route;
         this.plane = plane;
         this.deptTime = deptTime;
-        this.arriveTime = deptTime.plusHours( ( route.getDistance() * plane.getSpeed() ) );
+        this.arriveTime = deptTime.plusHours( ( route.getDistance() / plane.getSpeed() ) );
+        this.firstClassCost = firstClassCost;
+        this.coachCost = coachCost;
+        this.economyCost = economyCost;
+        save();
+    }
+
+    // From DB
+    public Flight( int flightID, Route route, Plane plane, LocalDateTime deptTime, LocalDateTime arriveTime, float firstClassCost, float coachCost, float economyCost ) {
+        this.flightID = flightID;
+        this.route = route;
+        this.plane = plane;
+        this.deptTime = deptTime;
+        this.arriveTime = arriveTime;
         this.firstClassCost = firstClassCost;
         this.coachCost = coachCost;
         this.economyCost = economyCost;
@@ -35,7 +49,7 @@ public class Flight {
             // Get connection
             Connection conn = Database.getInstance().getConnection();
 
-            String command = "INSERT INTO Flights(routeID, planeID, deptTime, arriveTime, firstClassCost, coachCost, enonomyCost) VALUES (?,?,?,?,?,?,?)";
+            String command = "INSERT INTO Flights(routeID, tailNumber, deptTime, arriveTime, firstClassCost, coachCost, economyCost) VALUES (?,?,?,?,?,?,?)";
 
             // Prepare statement
             PreparedStatement stmt = conn.prepareStatement( command , Statement.RETURN_GENERATED_KEYS );
@@ -77,6 +91,41 @@ public class Flight {
             case COACH: return coachCost;
             case ECONOMY: return economyCost;
             default: return 0;
+        }
+    }
+
+    public String getRoute() {
+        return route.toString();
+    }
+
+    public static Flight getByID( int flightID ) {
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT * FROM Flights WHERE flightID = ?";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            stmt.setInt( 1, flightID );
+
+            ResultSet result = stmt.executeQuery();
+
+            if ( result.next() ) {
+                Route route = Route.getByID( result.getInt( "routeID" ) );
+                Plane plane = Plane.getByID( result.getString( "tailNumber" ) );
+                LocalDateTime deptTime = LocalDateTime.parse( result.getString( "deptTime" ) );
+                LocalDateTime arriveTime = LocalDateTime.parse( result.getString( "arriveTime" ) );
+                float firstClassCost = result.getFloat( "firstClassCost" );
+                float coachCost = result.getFloat( "coachCost" );
+                float economyCost = result.getFloat( "economyCost" );
+
+                return new Flight( flightID, route, plane, deptTime, arriveTime, firstClassCost, coachCost, economyCost );
+            }
+
+            return null;
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting tickets: " + e );
+            return null;
         }
     }
 }

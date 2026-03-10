@@ -2,6 +2,7 @@ package com.airline;
 
 import java.sql.Connection;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -10,7 +11,16 @@ public class Passenger {
     private String name;
     private float money;
 
+    // New
     public Passenger( String name, float money ) {
+        this.name = name;
+        this.money = money;
+        save();
+    }
+
+    // From DB
+    public Passenger( int passengerID, String name, float money ) {
+        this.passengerID = passengerID;
         this.name = name;
         this.money = money;
     }
@@ -47,17 +57,76 @@ public class Passenger {
         return passengerID;
     }
 
-    public int updateMoney( float change ) {
+    public boolean updateMoney( float change ) {
         // Check sufficient funds, or if refund
         if ( change + money > 0 || change > 0 ) {
             money += change;
 
             // TODO update SQL
 
-            return 1;
+            return true;
         }
 
         // Return error
-        return -1;
+        return false;
+    }
+    
+    public String getName() {
+        return name;
+    }
+
+    public static ArrayList<Passenger> getAll() {
+        ArrayList<Passenger> passengers = new ArrayList<>();
+
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT passengerID FROM Passengers";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            ResultSet results = stmt.executeQuery();
+
+            while ( results.next() ) {
+                Passenger temp = getByID( results.getInt( "passengerID" ) );
+
+                if ( temp != null ) passengers.add( temp );
+            }
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting tickets: " + e );
+        }
+
+        return passengers;
+    }
+
+    public static Passenger getByID( int passengerID ) {
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT * FROM Passengers WHERE passengerID = ?";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            stmt.setInt( 1, passengerID );
+
+            ResultSet result = stmt.executeQuery();
+
+            if ( result.next() ) {
+                String name = result.getString( "name" );
+                float money = result.getFloat( "money" );
+
+                return new Passenger( passengerID, name, money );
+            }
+
+            return null;
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting tickets: " + e );
+            return null;
+        }
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

@@ -6,6 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 
 public abstract class Ticket {
     private int ticketID;
@@ -23,7 +24,18 @@ public abstract class Ticket {
         FIRST, COACH, ECONOMY
     }
 
+    // New Tickets
     public Ticket( Flight flight, Passenger passenger, TicketStatus status, TicketType type ) {
+        this.flight = flight;
+        this.passenger = passenger;
+        this.status = status;
+        this.type = type;
+        save();
+    }
+
+    // Tickets from DB
+    public Ticket( int ticketID, Flight flight, Passenger passenger, TicketStatus status, TicketType type ) {
+        this.ticketID = ticketID;
         this.flight = flight;
         this.passenger = passenger;
         this.status = status;
@@ -66,6 +78,22 @@ public abstract class Ticket {
         return ticketID;
     }
 
+    public String getRoute() {
+        return flight.getRoute();
+    }
+
+    public LocalDateTime getDeptTime() {
+        return flight.getDeptTime();
+    }
+
+    public TicketType getType() {
+        return type;
+    }
+
+    public TicketStatus getStatus() {
+        return status;
+    }
+
     public int daysTillFlight() {
         int days = (int) ChronoUnit.DAYS.between( LocalDateTime.now(), flight.getDeptTime() ); 
 
@@ -85,7 +113,7 @@ public abstract class Ticket {
 
         this.status = TicketStatus.CANCELLED;
 
-        if ( update() || refund != 0 ) {
+        if ( update() && refund != 0 ) {
             passenger.updateMoney( refund );
         }
     }
@@ -94,7 +122,7 @@ public abstract class Ticket {
         try {
             Connection conn = Database.getInstance().getConnection();
 
-            String command = "UPDATE Tickets SET flightID=?, passengerID=?, status=?, type=?, WHERE ticketID=?";
+            String command = "UPDATE Tickets SET flightID=?, passengerID=?, status=?, type=? WHERE ticketID=?";
 
             PreparedStatement stmt = conn.prepareStatement( command );
 
@@ -111,6 +139,87 @@ public abstract class Ticket {
             System.out.println( "Error updating ticket: " + e );
 
             return false;
+        }
+    }
+
+    public static ArrayList<Ticket> getAll() {
+        ArrayList<Ticket> tickets = new ArrayList<>();
+
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT ticketID FROM Tickets";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            ResultSet results = stmt.executeQuery();
+
+            while ( results.next() ) {
+                Ticket temp = getByID( results.getInt( "ticketID" ) );
+
+                if ( temp != null ) tickets.add( temp );
+            }
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting tickets: " + e );
+        }
+
+        return tickets;
+    }
+
+    public static ArrayList<Ticket> getForPassenger( int passengerID ) {
+        ArrayList<Ticket> tickets = new ArrayList<>();
+
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT ticketID FROM Tickets WHERE passengerID=?";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            stmt.setInt( 1, passengerID );
+
+            ResultSet results = stmt.executeQuery();
+
+            while ( results.next() ) {
+                Ticket temp = getByID( results.getInt( "ticketID" ) );
+
+                if ( temp != null ) tickets.add( temp );
+            }
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting tickets: " + e );
+        }
+
+        return tickets;
+    }
+
+    public static Ticket getByID( int ticketID ) {
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT * FROM Tickets WHERE ticketID = ?";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            stmt.setInt( 1, ticketID );
+
+            ResultSet result = stmt.executeQuery();
+
+            if ( result.next() ) {
+                Flight flight = Flight.getByID( result.getInt( "flightID" ) );
+                Passenger passenger = Passenger.getByID( result.getInt( "passengerID" ) );
+                TicketStatus status = TicketStatus.valueOf( result.getString( "status" ) );
+
+                switch( TicketType.valueOf( result.getString( "type" ) ) ) {
+                    case FIRST: return new FirstClassTicket( ticketID, flight, passenger, status );
+                    case COACH: return new CoachTicket( ticketID, flight, passenger, status );
+                    case ECONOMY: return new EconomyTicket( ticketID, flight, passenger, status );
+                }
+            }
+
+            return null;
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting tickets: " + e );
+            return null;
         }
     }
 }

@@ -2,19 +2,17 @@
 
 ```mermaid
 classDiagram
-    App  -->  FlightUI
-    FlightUI  --  Flight
-
-    App --> PassengerUI
-    PassengerUI <-- Passenger
-
+    App  -->  MainPanel
     App --> Database
 
-    Route -- Flight
-    Plane -- Flight
+    MainPanel --> AdminPanel
+    MainPanel --> PassengerPanel
+
+    Route --> Flight
+    Plane --> Flight
 
     Ticket <-- Passenger
-    Ticket --> Flight
+    Ticket <-- Flight
 
     Ticket <|-- FirstClass
     Ticket <|-- Coach
@@ -24,54 +22,75 @@ classDiagram
 
     }
 
-    class FlightUI {
-        +addPlane()
-        +addRoute()
-        +addFlight()
-        +removePlane()
-        +removeRoute()
-        +removeFlight()
+    class Database {
+        - instance : Database
+        - conn : Connection
+        - path : String
+        + getInstance()
+        + getConnection()
+        + seed()
+        - dropTable( tableName )
+        - createTables();
+
     }
 
-    class PassengerUI {
-        +searchFlight()
-        +bookTicket()
-        +payTicket()
-        +cancelTicket()
+    class MainPanel {
+    
+    }
+
+    class AdminPanel {
+
+    }
+
+    class PassengerPanel {
+
     }
 
     class Passenger {
         - passengerID : int
         - name : String
-        - address : String
         - money : double
+        + save()
+        + getID()
+        + updateMoney()
     }
 
     class Plane {
-        - planeID : int
+        - tailNumber : String
+        - speed : int
         - firstClassSeats : int
         - coachSeats : int
         - economySeats : int
-        +getSeats()
+        + save()
+        + getID()
+        + getSpeed()
+        + getSeats( TicketType type )
     }
 
     class Ticket {
         <<abstract>>
         - ticketID : int
-        - price : double
-        - status : String
-        +getTicketID()
-        +getClass()
-        +book()
-        +pay()
+        - status : TicketStatus
+        - flight : Flight
+        - passenger : Passenger
+        - type : TicketType
+        +save()
+        +getID()
+        +daysTillFlight()
+        +getPrice()
         +cancel()
-        +getStatus()
+        +update()
     }
 
     class Flight {
         - flightID : int
-        - deptTime : int
-        - arriveTime : int
+        - route : Route
+        - plane : Plane
+        - deptTime : LocalDateTime
+        - arriveTime : LocalDateTime
+        - firstClassCost : float
+        - coachCost : float
+        - economyCost : float
         +getDeparture()
         +seatsFree()
     }
@@ -80,18 +99,22 @@ classDiagram
         - RouteID : int
         - fromAirport : String
         - toAirport : String
+        - distance : int
+        + save()
+        + getID()
+        + getDistance()
     }
 
     class FirstClass {
-        cancel()
+        getRefund()
     }
 
     class Coach {
-        cancel()
+        getRefund()
     }
 
     class Economy {
-        cancel()
+        getRefund()
     }
 
 ```
