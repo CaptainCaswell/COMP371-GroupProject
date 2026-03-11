@@ -109,18 +109,55 @@ public abstract class Ticket {
     public void cancel() {
         // Check if ticket has been paid
         float refund = 0;
+
         if ( status == TicketStatus.CONFIRMED ) {
             refund = getRefund();
         }
 
         this.status = TicketStatus.CANCELLED;
 
-        if ( update() && refund != 0 ) {
+        // Update money if there was a refund
+        if ( refund != 0 ) {
             passenger.updateMoney( refund );
         }
+
+        update();
+    }
+
+    public String confirm() {
+        // Errors if not BOOKED
+        if ( status == TicketStatus.CONFIRMED ) {
+            return "Ticket already confirmed.";
+        }
+
+        if ( status == TicketStatus.CANCELLED ) {
+            return "Cannot confirm cancelled tickets.";
+        }
+
+        // Check availability
+        if ( flight.getCapacity( type ) == CapacityStatus.FULL ) {
+            return "Flight already full.";
+        }
+
+        // Charge passenger
+        if ( !passenger.updateMoney( flight.getPrice( type ) * -1 ) ) {
+            return "Insufficient funds.";
+        }
+
+        this.status = TicketStatus.CONFIRMED;
+
+        // Change status
+
+        if ( !update() ) {
+            return "Unable to confirm ticket.";
+            // TODO Reload from database?
+        }
+
+        return null;
     }
 
     public boolean update() {
+        // Update database
         try {
             Connection conn = Database.getInstance().getConnection();
 

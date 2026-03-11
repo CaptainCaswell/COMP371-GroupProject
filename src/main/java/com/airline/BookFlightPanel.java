@@ -1,8 +1,11 @@
 package com.airline;
 
+import com.github.lgooddatepicker.components.DatePicker;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import com.airline.Flight.CapacityStatus;
@@ -12,6 +15,10 @@ public class BookFlightPanel extends JPanel {
     private JTable table;
     private DefaultTableModel tableModel;
     private JComboBox<TicketType> typeDropdown;
+    private JComboBox<String> fromDropdown;
+    private JComboBox<String> toDropdown;
+    private DatePicker dateFromPicker;
+    private DatePicker dateToPicker;
     private JButton bookButton;
     private Passenger passenger;
 
@@ -20,6 +27,7 @@ public class BookFlightPanel extends JPanel {
 
         setLayout( new BorderLayout( 0,10 ) );
 
+        add( buildFilterPanel(), BorderLayout.NORTH );
         add( buildTablePanel(), BorderLayout.CENTER );
         add( buildBookPanel(), BorderLayout.SOUTH );
 
@@ -29,7 +37,7 @@ public class BookFlightPanel extends JPanel {
     private JPanel buildTablePanel() {
         JPanel panel = new JPanel( new BorderLayout() );
 
-        String[] columns = {"Flights", "Route", "Departure", "Arrival", "First Class", "Coach", "Economy" };
+        String[] columns = {"Flight", "Route", "Departure", "Arrival", "First Class", "Coach", "Economy" };
         tableModel = new DefaultTableModel( columns, 0 );
         table = new JTable( tableModel );
 
@@ -52,6 +60,53 @@ public class BookFlightPanel extends JPanel {
         return panel;
     }
 
+    private JPanel buildFilterPanel() {
+        JPanel panel = new JPanel( new GridLayout( 3, 1, 5, 5 ) );
+
+        // Row 1
+        JPanel datePanel = new JPanel( new FlowLayout( FlowLayout.LEFT ) );
+        dateFromPicker = new DatePicker();
+        dateToPicker = new DatePicker();
+        datePanel.add( new JLabel( "Departing after:" ) );
+        datePanel.add( dateFromPicker );
+        datePanel.add( new JLabel( "Departing before:" ) );
+        datePanel.add( dateToPicker );
+
+        
+
+        // Row 2
+        JPanel airportPanel = new JPanel( new FlowLayout( FlowLayout.LEFT ) );
+        fromDropdown = new JComboBox<>();
+        toDropdown = new JComboBox<>();
+        airportPanel.add( new JLabel( "Departure Airport:" ) );
+        airportPanel.add( fromDropdown );
+        airportPanel.add( new JLabel( "Destination Airport:" ) );
+        airportPanel.add( toDropdown );
+
+        // Row 3
+        JPanel buttonPanel = new JPanel( new FlowLayout( FlowLayout.LEFT ) );
+        JButton searchButton = new JButton( "Search" );
+        JButton clearButton = new JButton( "Clear" );
+
+        searchButton.addActionListener( e -> refresh() );
+
+        clearButton.addActionListener( e -> {
+            fromDropdown.setSelectedIndex( 0 );
+            toDropdown.setSelectedIndex( 0 );
+            // TODO Pickers
+            refresh();
+        });
+
+        buttonPanel.add( searchButton );
+        buttonPanel.add( clearButton );
+
+        panel.add( datePanel );
+        panel.add( airportPanel );
+        panel.add( buttonPanel );
+
+        return panel;
+    }
+
     private String formatCapacity( CapacityStatus status, float price ) {
         String capacityString;
 
@@ -67,8 +122,48 @@ public class BookFlightPanel extends JPanel {
 
     public void refresh() {
         tableModel.setRowCount( 0 );
+        
+
+        // Current Selection
+        String selectedFrom = (String) fromDropdown.getSelectedItem();
+        String selectedTo = (String) toDropdown.getSelectedItem();
+
+        // Empty and refill dropdowns
+        fromDropdown.removeAllItems();
+        toDropdown.removeAllItems();
+        fromDropdown.addItem( "" );
+        toDropdown.addItem( "" );
+
         ArrayList<Flight> flights = Flight.getAll();
+
         for ( Flight flight : flights ) {
+            String from = flight.getFromAirport();
+            String to = flight.getToAirport();
+
+            if ( !containsItem( fromDropdown, from ) ) fromDropdown.addItem( from ); // TODO Needed?
+            if ( !containsItem( toDropdown, to ) ) toDropdown.addItem( to );
+        }
+
+        // Restore selections
+        fromDropdown.setSelectedItem( selectedFrom );
+        toDropdown.setSelectedItem( selectedTo );
+
+        // Filter and populate table
+        String filterFrom = (String) fromDropdown.getSelectedItem();
+        String filterTo = (String) toDropdown.getSelectedItem();
+
+        LocalDate dateFrom = dateFromPicker.getDate();
+        LocalDate dateTo = dateToPicker.getDate();
+
+        for ( Flight flight : flights ) {
+            // Skip filtered dates
+            if ( dateFrom != null && flight.getDeptTime().toLocalDate().isBefore( dateFrom ) ) continue;
+            if ( dateTo != null && flight.getDeptTime().toLocalDate().isAfter( dateTo ) ) continue;
+            
+            // Skip filtered airports
+            if ( filterFrom != null && !filterFrom.isEmpty() && !flight.getFromAirport().equals ( filterFrom ) ) continue;
+            if ( filterTo != null && !filterTo.isEmpty() && !flight.getToAirport().equals ( filterTo ) ) continue;
+
             tableModel.addRow( new Object[] {
                 flight.getID(),
                 flight.getRoute(),
@@ -79,6 +174,13 @@ public class BookFlightPanel extends JPanel {
                 formatCapacity( flight.getCapacity( TicketType.ECONOMY ), flight.getPrice( TicketType.ECONOMY ) )
             });
         }
+    }
+
+    private boolean containsItem( JComboBox<String> dropdown, String item ) {
+        for ( int i = 0; i < dropdown.getItemCount(); i++ ) {
+            if (dropdown.getItemAt( i ).equals( item ) ) return true;
+        }
+        return false;
     }
 
     private void bookFlight() {

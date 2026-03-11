@@ -30,6 +30,11 @@
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.45.0.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.github.lgooddatepicker</groupId>
+      <artifactId>LGoodDatePicker</artifactId>
+      <version>11.2.1</version>
+  </dependency>
   </dependencies>
 
   <build>

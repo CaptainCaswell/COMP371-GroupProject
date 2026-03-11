@@ -65,6 +65,14 @@ public class Route {
         return distance;
     }
 
+    public String getFromAirport() {
+        return fromAirport;
+    }
+
+    public String getToAirport() {
+        return toAirport;
+    }
+
     @Override
     public String toString() {
         return fromAirport + " → " + toAirport;

@@ -90,6 +90,10 @@ public class Flight {
         return deptTime;
     }
 
+    public LocalDateTime getArriveTime() {
+        return deptTime;
+    }
+
     public float getPrice( TicketType type ) {
         switch( type ) {
             case FIRST: return firstClassCost;
@@ -101,6 +105,14 @@ public class Flight {
 
     public String getRoute() {
         return route.toString();
+    }
+
+    public String getFromAirport() {
+        return route.getFromAirport();
+    }
+
+    public String getToAirport() {
+        return route.getToAirport();
     }
 
     public CapacityStatus getCapacity( TicketType type ) {

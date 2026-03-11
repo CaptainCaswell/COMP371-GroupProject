@@ -12,7 +12,7 @@ public class Passenger {
     private float money;
 
     // New
-    public Passenger( String name, float money ) {
+    public Passenger( String name, float money) {
         this.name = name;
         this.money = money;
         save();
@@ -62,12 +62,25 @@ public class Passenger {
         if ( change + money > 0 || change > 0 ) {
             money += change;
 
-            // TODO update SQL
+            // Save change to database
+            try {
+                Connection conn = Database.getInstance().getConnection();
 
-            return true;
+                String sql = "UPDATE Passengers SET money=? WHERE passengerID=?";
+                PreparedStatement stmt = conn.prepareStatement(sql);
+
+                stmt.setFloat(1, money);
+                stmt.setInt(2, passengerID);
+                
+                stmt.executeUpdate();
+
+                return true;
+            } catch (Exception e) {
+                System.out.println("Error updating passenger money: " + e);
+                return false;
+            }
         }
 
-        // Return error
         return false;
     }
     
@@ -127,6 +140,6 @@ public class Passenger {
 
     @Override
     public String toString() {
-        return name;
+        return name + " ($" + String.format( "%.2f", money ) + ")";
     }
 }
