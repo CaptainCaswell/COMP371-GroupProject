@@ -7,6 +7,7 @@ import java.util.ArrayList;
 public class PassengerPanel extends JPanel {
     private JComboBox<Passenger> passengerDropdown;
     private MyTicketsPanel myTicketsPanel;
+    private BookFlightPanel bookFlightPanel;
 
     public PassengerPanel() {
         setLayout( new BorderLayout() );
@@ -15,14 +16,29 @@ public class PassengerPanel extends JPanel {
         passengerDropdown = new JComboBox<>();
         loadPassengers();
 
+        // Get initial Passenger
+        Passenger initial = (Passenger) passengerDropdown.getSelectedItem();
+
         JTabbedPane tabs = new JTabbedPane();
         myTicketsPanel = new MyTicketsPanel();
+        bookFlightPanel = new BookFlightPanel( initial );
         tabs.addTab( "My Tickets", myTicketsPanel );
+        tabs.addTab( "Book Flights", bookFlightPanel );
+
+        // Refresh pages when changing tabs
+        tabs.addChangeListener( e-> {
+            Passenger selected = (Passenger) passengerDropdown.getSelectedItem();
+            if ( selected != null ) {
+                myTicketsPanel.refresh( selected );
+                bookFlightPanel.refresh();
+            }
+        });
 
         passengerDropdown.addActionListener( e -> {
             Passenger selected = ( Passenger ) passengerDropdown.getSelectedItem();
             if ( selected != null ) {
                 myTicketsPanel.refresh( selected );
+                bookFlightPanel.setPassenger( selected );
             }
         });
 

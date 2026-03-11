@@ -3,6 +3,7 @@ package com.airline;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 import com.airline.Ticket.TicketStatus;
 import com.airline.Ticket.TicketType;
@@ -102,7 +103,7 @@ public class Flight {
         return route.toString();
     }
 
-    public CapacityStatus isScarce( TicketType type ) {
+    public CapacityStatus getCapacity( TicketType type ) {
         // Get total seats
         int capacity = plane.getSeats( type );
 
@@ -145,5 +146,29 @@ public class Flight {
             System.out.println ( "Error getting tickets: " + e );
             return null;
         }
+    }
+
+    public static ArrayList<Flight> getAll() {
+        ArrayList<Flight> flights = new ArrayList<>();
+
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT flightID FROM Flights";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            ResultSet results = stmt.executeQuery();
+
+            while ( results.next() ) {
+                Flight temp = getByID( results.getInt( "flightID" ) );
+
+                if ( temp != null ) flights.add( temp );
+            }
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting flights: " + e );
+        }
+
+        return flights;
     }
 }
