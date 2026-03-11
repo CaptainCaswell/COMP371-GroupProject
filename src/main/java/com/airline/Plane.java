@@ -71,6 +71,11 @@ public class Plane {
         }
     }
 
+    @Override
+    public String toString() {
+        return tailNumber;
+    }
+
     public static Plane getByID( String tailNumber ) {
         try {
             Connection conn = Database.getInstance().getConnection();

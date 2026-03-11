@@ -115,6 +115,10 @@ public class Flight {
         return route.getToAirport();
     }
 
+    public String getTailNumber() {
+        return plane.getID();
+    }
+
     public CapacityStatus getCapacity( TicketType type ) {
         // Get total seats
         int capacity = plane.getSeats( type );
@@ -182,5 +186,25 @@ public class Flight {
         }
 
         return flights;
+    }
+
+    public static boolean remove( int flightID ) {
+        // Try removing flight
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "DELETE FROM Flights WHERE flightID = ?";
+            PreparedStatement stmt = conn.prepareStatement(command);
+
+            stmt.setInt( 1, flightID );
+            stmt.executeUpdate();
+
+            return true;
+        }
+        
+        // Remove failed, likely forign key issue
+        catch ( Exception e ) {
+            return false;
+        }
     }
 }

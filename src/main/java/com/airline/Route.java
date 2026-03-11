@@ -2,7 +2,7 @@ package com.airline;
 
 import java.sql.Connection;
 import java.sql.Statement;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -102,6 +102,50 @@ public class Route {
         } catch ( Exception e ) {
             System.out.println ( "Error getting tickets: " + e );
             return null;
+        }
+    }
+
+    public static ArrayList<Route> getAll() {
+        ArrayList<Route> routes = new ArrayList<>();
+
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT routeID FROM Routes";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            ResultSet results = stmt.executeQuery();
+
+            while ( results.next() ) {
+                Route temp = getByID( results.getInt( "routeID" ) );
+
+                if ( temp != null ) routes.add( temp );
+            }
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting routes: " + e );
+        }
+
+        return routes;
+    }
+
+    public static boolean remove( int routeID ) {
+        // Try removing plane
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "DELETE FROM Routes WHERE routeID = ?";
+            PreparedStatement stmt = conn.prepareStatement(command);
+
+            stmt.setInt( 1, routeID );
+            stmt.executeUpdate();
+
+            return true;
+        }
+        
+        // Remove failed, likely forign key issue
+        catch ( Exception e ) {
+            return false;
         }
     }
 }

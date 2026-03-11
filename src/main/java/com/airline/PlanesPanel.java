@@ -55,6 +55,16 @@ public class PlanesPanel extends JPanel {
         form.add( addButton );
 
         addButton.addActionListener( e -> {
+            // Check for empty fields
+            if ( tailNumberField.getText().trim().isEmpty() ||
+                    speedField.getText().trim().isEmpty() ||
+                    firstClassField.getText().trim().isEmpty() ||
+                    coachField.getText().trim().isEmpty() ||
+                    economyField.getText().trim().isEmpty() ) {
+                JOptionPane.showMessageDialog( this, "All fields must be filled in.", "Missing Fields", JOptionPane.WARNING_MESSAGE );
+                return;
+            }
+
             new Plane(
                 tailNumberField.getText(),
                 Integer.parseInt( speedField.getText() ),
