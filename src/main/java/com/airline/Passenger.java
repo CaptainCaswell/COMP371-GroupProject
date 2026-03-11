@@ -93,7 +93,7 @@ public class Passenger {
             }
 
         } catch ( Exception e ) {
-            System.out.println ( "Error getting tickets: " + e );
+            System.out.println ( "Error getting passengers: " + e );
         }
 
         return passengers;

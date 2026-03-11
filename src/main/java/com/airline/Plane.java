@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import com.airline.Ticket.TicketType;
 
 public class Plane {
     private String tailNumber;
@@ -60,6 +62,15 @@ public class Plane {
         return speed;
     }
 
+    public int getSeats( TicketType type ) {
+        switch( type ) {
+            case FIRST: return firstClassSeats;
+            case COACH: return coachSeats;
+            case ECONOMY: return economySeats;
+            default: return 0;
+        }
+    }
+
     public static Plane getByID( String tailNumber ) {
         try {
             Connection conn = Database.getInstance().getConnection();
@@ -85,6 +96,50 @@ public class Plane {
         } catch ( Exception e ) {
             System.out.println ( "Error getting tickets: " + e );
             return null;
+        }
+    }
+
+    public static ArrayList<Plane> getAll() {
+        ArrayList<Plane> planes = new ArrayList<>();
+
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT tailNumber FROM Planes";
+            PreparedStatement stmt = conn.prepareStatement( command );
+
+            ResultSet results = stmt.executeQuery();
+
+            while ( results.next() ) {
+                Plane temp = getByID( results.getString( "tailNumber" ) );
+
+                if ( temp != null ) planes.add( temp );
+            }
+
+        } catch ( Exception e ) {
+            System.out.println ( "Error getting planes: " + e );
+        }
+
+        return planes;
+    }
+
+    public static boolean remove( String tailNumber ) {
+        // Try removing plane
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "DELETE FROM Planes WHERE tailNumber = ?";
+            PreparedStatement stmt = conn.prepareStatement(command);
+
+            stmt.setString( 1, tailNumber );
+            stmt.executeUpdate();
+
+            return true;
+        }
+        
+        // Remove failed, likely forign key issue
+        catch ( Exception e ) {
+            return false;
         }
     }
 }

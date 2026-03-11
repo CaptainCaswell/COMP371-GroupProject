@@ -20,6 +20,10 @@ public class Flight {
     private float coachCost;
     private float economyCost;
 
+    public enum CapacityStatus {
+        OPEN, SCARCE, FULL
+    }
+
     // New
     public Flight( Route route, Plane plane, LocalDateTime deptTime, float firstClassCost, float coachCost, float economyCost ) {
         this.route = route;
@@ -96,6 +100,20 @@ public class Flight {
 
     public String getRoute() {
         return route.toString();
+    }
+
+    public CapacityStatus isScarce( TicketType type ) {
+        // Get total seats
+        int capacity = plane.getSeats( type );
+
+        // Get booked and confirmed seats
+        int booked = Ticket.getCount( flightID, type, TicketStatus.BOOKED );
+        int confirmed = Ticket.getCount( flightID, type, TicketStatus.CONFIRMED );
+
+        // Return based on if seats are available
+        if ( confirmed >= capacity ) return CapacityStatus.FULL;
+        if ( confirmed + booked >= capacity ) return CapacityStatus.SCARCE;
+        return CapacityStatus.OPEN;
     }
 
     public static Flight getByID( int flightID ) {

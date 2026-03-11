@@ -8,6 +8,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
+import com.airline.Flight.CapacityStatus;
+
 public abstract class Ticket {
     private int ticketID;
     private TicketStatus status;
@@ -221,5 +223,27 @@ public abstract class Ticket {
             System.out.println ( "Error getting tickets: " + e );
             return null;
         }
+    }
+
+    public static int getCount( int flightID, TicketType type, TicketStatus status ) {
+        try {
+            Connection conn = Database.getInstance().getConnection();
+
+            String command = "SELECT COUNT(*) FROM Tickets WHERE flightID=? AND type=? AND status=?";
+            PreparedStatement stmt = conn.prepareStatement(command);
+
+            stmt.setInt( 1, flightID );
+            stmt.setString( 2, type.toString() );
+            stmt.setString( 3, status.toString() );
+
+            ResultSet result = stmt.executeQuery();
+
+            // Return if result returned
+            if ( result.next() ) return result.getInt( 1 );
+        } catch ( Exception e ) {
+            System.out.println("Error getting ticket count: " + e);
+        }
+        
+        return 0;
     }
 }
