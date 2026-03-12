@@ -186,6 +186,12 @@ public class BookFlightPanel extends JPanel {
     private void bookFlight() {
         int selectedRow = table.getSelectedRow();
 
+        // Make sure flight is selected
+        if ( selectedRow == -1 ) {
+            JOptionPane.showMessageDialog( this, "Please select a flight.", "No Flight Selected", JOptionPane.WARNING_MESSAGE );
+            return;
+        }
+
         int flightID = (int) tableModel.getValueAt( selectedRow, 0 );
         Flight flight = Flight.getByID( flightID );
         TicketType type = (TicketType) typeDropdown.getSelectedItem();

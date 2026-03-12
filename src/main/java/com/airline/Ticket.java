@@ -110,8 +110,11 @@ public abstract class Ticket {
         // Check if ticket has been paid
         float refund = 0;
 
+        System.out.println( "DEBUG: canceling" );
+
         if ( status == TicketStatus.CONFIRMED ) {
             refund = getRefund();
+            System.out.println( "DEBUG: refund = " + refund );
         }
 
         this.status = TicketStatus.CANCELLED;
@@ -120,6 +123,8 @@ public abstract class Ticket {
         if ( refund != 0 ) {
             passenger.updateMoney( refund );
         }
+
+        System.out.println( "DEBUG: updating" );
 
         update();
     }
@@ -144,14 +149,16 @@ public abstract class Ticket {
             return "Insufficient funds.";
         }
 
+        // Change status
         this.status = TicketStatus.CONFIRMED;
 
-        // Change status
-
+        // Update database
         if ( !update() ) {
             return "Unable to confirm ticket.";
             // TODO Reload from database?
         }
+
+        // Remove 
 
         return null;
     }
@@ -285,8 +292,8 @@ public abstract class Ticket {
     }
 
     public static String book( Flight flight, Passenger passenger, TicketType type ) {
-        if ( flight == null ) return "Please select a flight.";
-        if ( passenger == null ) return "No passenger selcted.";
+        if ( flight == null ) return "Invalid flight selected.";
+        if ( passenger == null ) return "Invalid passenger selcted.";
         if ( flight.getCapacity( type ) == CapacityStatus.FULL ) return "This flight is full.";
 
         switch ( type ) {
