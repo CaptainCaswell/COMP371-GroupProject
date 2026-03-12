@@ -9,7 +9,7 @@ public class CoachTicket extends Ticket {
 
     // Tickets from DB
     public CoachTicket( int ticketID, Flight flight, Passenger passenger, TicketStatus status ) {
-        super( ticketID, flight, passenger, status, TicketType.FIRST );
+        super( ticketID, flight, passenger, status, TicketType.COACH );
     }
 
     public float getRefund() {
