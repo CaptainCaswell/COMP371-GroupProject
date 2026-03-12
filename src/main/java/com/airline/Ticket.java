@@ -283,4 +283,19 @@ public abstract class Ticket {
         
         return 0;
     }
+
+    public static String book( Flight flight, Passenger passenger, TicketType type ) {
+        if ( flight == null ) return "Please select a flight.";
+        if ( passenger == null ) return "No passenger selcted.";
+        if ( flight.getCapacity( type ) == CapacityStatus.FULL ) return "This flight is full.";
+
+        switch ( type ) {
+            case FIRST: new FirstClassTicket( flight, passenger ); break;
+            case COACH: new CoachTicket( flight, passenger ); break;
+            case ECONOMY: new EconomyTicket( flight , passenger ); break;
+            default: return "Invalid ticket type.";
+        }
+
+        return null;
+    }
 }

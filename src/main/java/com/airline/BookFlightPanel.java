@@ -186,30 +186,18 @@ public class BookFlightPanel extends JPanel {
     private void bookFlight() {
         int selectedRow = table.getSelectedRow();
 
-        if ( selectedRow == -1 ) {
-            JOptionPane.showMessageDialog( this, "Please select a flight.", "No Flight selected", JOptionPane.WARNING_MESSAGE );
-            return;
-        }
-
         int flightID = (int) tableModel.getValueAt( selectedRow, 0 );
         Flight flight = Flight.getByID( flightID );
         TicketType type = (TicketType) typeDropdown.getSelectedItem();
 
-        if ( flight.getCapacity( type ) == CapacityStatus.FULL ) {
-            JOptionPane.showMessageDialog( this, "This flight is full.", "Full", JOptionPane.WARNING_MESSAGE );
-            return;
+        String error = Ticket.book( flight, passenger, type );
+
+        if ( error == null ) {
+            JOptionPane.showMessageDialog( this, "Flight booked!", "Success", JOptionPane.INFORMATION_MESSAGE );
+            refresh();
+        } else {
+            JOptionPane.showMessageDialog( this, error, "Booking Failed", JOptionPane.ERROR_MESSAGE );
         }
-
-        // TODO Add reminder to confirm soon if scarce?
-
-        switch ( type ) {
-            case FIRST: new FirstClassTicket( flight, passenger ); break;
-            case COACH: new CoachTicket( flight, passenger ); break;
-            case ECONOMY: new EconomyTicket( flight , passenger ); break;
-        }
-
-        JOptionPane.showMessageDialog( this, "Flight booked!", "Success", JOptionPane.INFORMATION_MESSAGE );
-        refresh();
     }
 
     public void setPassenger( Passenger passenger ) {
