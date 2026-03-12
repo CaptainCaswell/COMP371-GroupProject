@@ -31,7 +31,7 @@ public class Route {
     public void save() {
         try {
             // Get connection
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "INSERT INTO Routes(fromAirport, toAirport, distance) VALUES (?,?,?)";
 
@@ -80,7 +80,7 @@ public class Route {
 
     public static Route getByID( int routeID ) {
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT * FROM Routes WHERE routeID = ?";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -109,7 +109,7 @@ public class Route {
         ArrayList<Route> routes = new ArrayList<>();
 
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT routeID FROM Routes";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -132,7 +132,7 @@ public class Route {
     public String remove() {
         // Try removing plane
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "DELETE FROM Routes WHERE routeID = ?";
             PreparedStatement stmt = conn.prepareStatement(command);

@@ -2,6 +2,9 @@ package com.airline;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+
+import com.airline.Ticket.TicketStatus;
+
 import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -23,7 +26,7 @@ public class MyTicketsPanel extends JPanel {
     private JPanel buildTablePanel() {
         JPanel panel = new JPanel(new BorderLayout() );
 
-        String[] columns = { "ticketID", "Route", "Departure", "Type", "Status", "Cost", "Days Until Flight", };
+        String[] columns = { "ticketID", "Route", "Departure", "Type", "Status", "Cost", "Days Until Flight", "Alerts" };
         tableModel = new DefaultTableModel( columns, 0 );
         table = new JTable( tableModel );
         
@@ -105,7 +108,8 @@ public class MyTicketsPanel extends JPanel {
                 ticket.getType(),
                 ticket.getStatus(),
                 ticket.getPrice(),
-                ticket.daysTillFlight()
+                ticket.daysTillFlight(),
+                ticket.getAlert()
             });
         }
     }

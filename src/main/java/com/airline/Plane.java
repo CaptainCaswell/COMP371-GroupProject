@@ -34,7 +34,7 @@ public class Plane {
     public void save() {
         try {
             // Get connection
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "INSERT INTO Planes(tailNumber,speed,firstClassSeats,coachSeats,economySeats) VALUES (?,?,?,?,?)";
 
@@ -78,7 +78,7 @@ public class Plane {
 
     public static Plane getByID( String tailNumber ) {
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT * FROM Planes WHERE tailNumber = ?";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -108,7 +108,7 @@ public class Plane {
         ArrayList<Plane> planes = new ArrayList<>();
 
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT tailNumber FROM Planes";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -131,7 +131,7 @@ public class Plane {
     public String remove() {
         // Try removing plane
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "DELETE FROM Planes WHERE tailNumber = ?";
             PreparedStatement stmt = conn.prepareStatement(command);

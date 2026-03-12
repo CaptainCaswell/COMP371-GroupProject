@@ -35,8 +35,8 @@ public class Database {
         return instance;
     }
 
-    public Connection getConnection() {
-        return conn;
+    public static Connection getConnection() {
+        return getInstance().conn;
     }
 
     public void seed() {

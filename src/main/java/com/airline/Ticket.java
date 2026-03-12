@@ -9,6 +9,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import com.airline.Flight.CapacityStatus;
+import com.airline.Ticket.TicketStatus;
 
 public abstract class Ticket {
     private int ticketID;
@@ -49,7 +50,7 @@ public abstract class Ticket {
     public void save() {
         try {
             // Get connection
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "INSERT INTO Tickets(flightID,passengerID,status,type) VALUES (?,?,?,?)";
 
@@ -166,7 +167,7 @@ public abstract class Ticket {
     public boolean update() {
         // Update database
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "UPDATE Tickets SET flightID=?, passengerID=?, status=?, type=? WHERE ticketID=?";
 
@@ -188,11 +189,22 @@ public abstract class Ticket {
         }
     }
 
+    public String getAlert() {
+        // Check if flight full
+        if ( getStatus() == TicketStatus.BOOKED && flight.getCapacity( type ) == CapacityStatus.FULL ) return "Flight full, wait for cancelation.";
+
+        // Check if tickets overbooked
+        if ( getStatus() == TicketStatus.BOOKED && flight.getCapacity( type ) == CapacityStatus.SCARCE ) return "Confirm soon!";
+
+        // No alerts
+        return "";
+    }
+
     public static ArrayList<Ticket> getAll() {
         ArrayList<Ticket> tickets = new ArrayList<>();
 
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT ticketID FROM Tickets";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -216,7 +228,7 @@ public abstract class Ticket {
         ArrayList<Ticket> tickets = new ArrayList<>();
 
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT ticketID FROM Tickets WHERE passengerID=?";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -240,7 +252,7 @@ public abstract class Ticket {
 
     public static Ticket getByID( int ticketID ) {
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT * FROM Tickets WHERE ticketID = ?";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -271,7 +283,7 @@ public abstract class Ticket {
 
     public static int getCount( int flightID, TicketType type, TicketStatus status ) {
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT COUNT(*) FROM Tickets WHERE flightID=? AND type=? AND status=?";
             PreparedStatement stmt = conn.prepareStatement(command);

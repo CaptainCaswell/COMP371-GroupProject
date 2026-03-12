@@ -28,7 +28,7 @@ public class Passenger {
     public void save() {
         try {
             // Get connection
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "INSERT INTO Passengers(name,money) VALUES (?,?)";
 
@@ -64,7 +64,7 @@ public class Passenger {
 
             // Save change to database
             try {
-                Connection conn = Database.getInstance().getConnection();
+                Connection conn = Database.getConnection();
 
                 String sql = "UPDATE Passengers SET money=? WHERE passengerID=?";
                 PreparedStatement stmt = conn.prepareStatement(sql);
@@ -92,7 +92,7 @@ public class Passenger {
         ArrayList<Passenger> passengers = new ArrayList<>();
 
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT passengerID FROM Passengers";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -114,7 +114,7 @@ public class Passenger {
 
     public static Passenger getByID( int passengerID ) {
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT * FROM Passengers WHERE passengerID = ?";
             PreparedStatement stmt = conn.prepareStatement( command );

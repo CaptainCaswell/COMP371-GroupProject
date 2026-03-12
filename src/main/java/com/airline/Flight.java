@@ -52,7 +52,7 @@ public class Flight {
     public void save() {
         try {
             // Get connection
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "INSERT INTO Flights(routeID, tailNumber, deptTime, arriveTime, firstClassCost, coachCost, economyCost) VALUES (?,?,?,?,?,?,?)";
 
@@ -135,7 +135,7 @@ public class Flight {
 
     public static Flight getByID( int flightID ) {
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT * FROM Flights WHERE flightID = ?";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -168,7 +168,7 @@ public class Flight {
         ArrayList<Flight> flights = new ArrayList<>();
 
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "SELECT flightID FROM Flights";
             PreparedStatement stmt = conn.prepareStatement( command );
@@ -191,7 +191,7 @@ public class Flight {
     public String remove() {
         // Try removing flight
         try {
-            Connection conn = Database.getInstance().getConnection();
+            Connection conn = Database.getConnection();
 
             String command = "DELETE FROM Flights WHERE flightID = ?";
             PreparedStatement stmt = conn.prepareStatement(command);
