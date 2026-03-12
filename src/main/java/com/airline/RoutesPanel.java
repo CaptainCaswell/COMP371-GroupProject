@@ -76,14 +76,18 @@ public class RoutesPanel extends JPanel {
             int selectedRow = table.getSelectedRow();
             if ( selectedRow != -1 ) {
                 int routeID = (int) tableModel.getValueAt( selectedRow, 0 );
-                if ( !Route.remove( routeID ) ) {
+                Route route = Route.getByID( routeID );
+
+                String error = route.remove();
+
+                if ( error == null ) {
+                    refresh();
+                } else {
                     JOptionPane.showMessageDialog( this,
-                        "Cannot remove route - it is used in existing flights. Remove flights and try again.",
+                        error,
                         "Remove Failed",
                         JOptionPane.ERROR_MESSAGE
                     );
-                } else {
-                    refresh();
                 }
             }
         });

@@ -128,7 +128,7 @@ public class Plane {
         return planes;
     }
 
-    public static boolean remove( String tailNumber ) {
+    public String remove() {
         // Try removing plane
         try {
             Connection conn = Database.getInstance().getConnection();
@@ -139,12 +139,12 @@ public class Plane {
             stmt.setString( 1, tailNumber );
             stmt.executeUpdate();
 
-            return true;
+            return null;
         }
         
         // Remove failed, likely forign key issue
         catch ( Exception e ) {
-            return false;
+            return "Cannot remove plane - it is used in existing flights. Remove flights and try again.";
         }
     }
 }

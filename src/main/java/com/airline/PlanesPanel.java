@@ -91,14 +91,18 @@ public class PlanesPanel extends JPanel {
             int selectedRow = table.getSelectedRow();
             if( selectedRow != -1 ) {
                 String tailNumber = (String) tableModel.getValueAt( selectedRow, 0 );
-                if ( Plane.remove( tailNumber ) ) {
+                Plane plane = Plane.getByID( tailNumber );
+
+                String error = plane.remove();
+
+                if ( error == null ) {
+                    refresh();
+                } else {
                     JOptionPane.showMessageDialog( this, 
-                        "Cannot remove plane - it is used in existing flights. Remove flights and try again.",
+                        error,
                         "Remove failed",
                         JOptionPane.ERROR_MESSAGE
                     );
-                } else {
-                    refresh();
                 }
                 
             }

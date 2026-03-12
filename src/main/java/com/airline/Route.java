@@ -129,7 +129,7 @@ public class Route {
         return routes;
     }
 
-    public static boolean remove( int routeID ) {
+    public String remove() {
         // Try removing plane
         try {
             Connection conn = Database.getInstance().getConnection();
@@ -140,12 +140,12 @@ public class Route {
             stmt.setInt( 1, routeID );
             stmt.executeUpdate();
 
-            return true;
+            return null;
         }
         
         // Remove failed, likely forign key issue
         catch ( Exception e ) {
-            return false;
+            return "Cannot remove route - it is used in existing flights. Remove flights and try again.";
         }
     }
 }

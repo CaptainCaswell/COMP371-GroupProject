@@ -188,7 +188,7 @@ public class Flight {
         return flights;
     }
 
-    public static boolean remove( int flightID ) {
+    public String remove() {
         // Try removing flight
         try {
             Connection conn = Database.getInstance().getConnection();
@@ -199,12 +199,12 @@ public class Flight {
             stmt.setInt( 1, flightID );
             stmt.executeUpdate();
 
-            return true;
+            return null;
         }
         
         // Remove failed, likely forign key issue
         catch ( Exception e ) {
-            return false;
+            return "Cannot remove flight - it has existing tickets. Remove tickets and try again.";
         }
     }
 }

@@ -100,14 +100,17 @@ public class FlightsPanel extends JPanel {
             int selectedRow = table.getSelectedRow();
             if ( selectedRow != -1 ) {
                 int flightID = (int) tableModel.getValueAt( selectedRow, 0 );
-                if ( !Flight.remove( flightID ) ) {
+                Flight flight = Flight.getByID( flightID );
+
+                String error = flight.remove();
+                if ( error == null ) {
+                    refresh();
+                } else {
                     JOptionPane.showMessageDialog( this,
-                        "Cannot remove flight - it has existing tickets. Remove tickets and try again.",
+                        error,
                         "Remove Failed",
                         JOptionPane.ERROR_MESSAGE
                     );
-                } else {
-                    refresh();
                 }
             }
         });
