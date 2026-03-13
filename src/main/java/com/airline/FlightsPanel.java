@@ -4,13 +4,18 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.ArrayList;
-import com.github.lgooddatepicker.components.DateTimePicker;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import com.github.lgooddatepicker.components.DatePicker;
 
 public class FlightsPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JComboBox<Route> routeDropdown;
     private JComboBox<Plane> planeDropdown;
-    private DateTimePicker deptTimePicker;
+    private DatePicker deptDatePicker;
+    private JSpinner deptTimeSpinner;
     private JTextField firstClassCostField;
     private JTextField coachCostField;
     private JTextField economyCostField;
@@ -28,34 +33,44 @@ public class FlightsPanel extends JPanel {
 
     // Form for adding
     private JPanel buildFormPanel() {
-        JPanel form = new JPanel( new GridLayout( 2, 7, 5, 5 ) );
+        JPanel form = new JPanel( new GridLayout( 4, 4, 5, 5 ) );
         form.setBorder( BorderFactory.createEmptyBorder( 10, 10, 10, 10 ) );
-
-        // Labels
-        form.add( new JLabel( "Route" ) );
-        form.add( new JLabel( "Plane" ) );
-        form.add( new JLabel( "Departure Time" ) );
-        form.add( new JLabel( "First Class Cost" ) );
-        form.add( new JLabel( "Coach Cost" ) );
-        form.add( new JLabel( "Economy Cost" ) );
-        form.add( new JLabel( "" ) );
 
         // Fields
         routeDropdown = new JComboBox<>();
         planeDropdown = new JComboBox<>();
-        deptTimePicker = new DateTimePicker();
+        deptDatePicker = new DatePicker();
+        SpinnerDateModel timeModel = new SpinnerDateModel();
+        deptTimeSpinner = new JSpinner( timeModel);
         firstClassCostField = new JTextField();
         coachCostField = new JTextField();
         economyCostField = new JTextField();
         JButton addButton = new JButton( "Add Flight" );
 
+        JSpinner.DateEditor timeEditor = new JSpinner.DateEditor( deptTimeSpinner, "HH:mm" );
+        deptTimeSpinner.setEditor( timeEditor );
+
         // Populate dropdowns
         for ( Route route : Route.getAll() ) routeDropdown.addItem( route );
         for ( Plane plane : Plane.getAll() ) planeDropdown.addItem( plane );
 
+        // Top
+        form.add( new JLabel( "Route" ) );
+        form.add( new JLabel( "Plane" ) );
+        form.add( new JLabel( "Departure Date" ) );
+        form.add( new JLabel( "Departure Time" ) );
+        
         form.add( routeDropdown );
         form.add( planeDropdown );
-        form.add( deptTimePicker );
+        form.add( deptDatePicker );
+        form.add( deptTimeSpinner );
+
+        // Bottom
+        form.add( new JLabel( "First Class Cost" ) );
+        form.add( new JLabel( "Coach Cost" ) );
+        form.add( new JLabel( "Economy Cost" ) );
+        form.add( new JLabel( "" ) );
+
         form.add( firstClassCostField );
         form.add( coachCostField );
         form.add( economyCostField );
@@ -65,7 +80,8 @@ public class FlightsPanel extends JPanel {
             // Check for empty fields
             if ( routeDropdown.getSelectedItem() == null ||
                     planeDropdown.getSelectedItem() == null ||
-                    deptTimePicker.getDateTimePermissive() == null ||
+                    deptDatePicker.getDate() == null ||
+                    deptTimeSpinner.getValue() == null ||
                     firstClassCostField.getText().trim().isEmpty() ||
                     coachCostField.getText().trim().isEmpty() ||
                     economyCostField.getText().trim().isEmpty() ) {
@@ -73,10 +89,15 @@ public class FlightsPanel extends JPanel {
                 return;
             }
 
+            // Assemble Deptarture Date and Time
+            LocalDate date = deptDatePicker.getDate();
+            String time = new SimpleDateFormat( "HH:mm" ).format( deptTimeSpinner.getValue() );
+            LocalDateTime deptTime = LocalDateTime.parse( date + "T" + time );
+
             new Flight(
                 (Route) routeDropdown.getSelectedItem(),
                 (Plane) planeDropdown.getSelectedItem(),
-                deptTimePicker.getDateTimePermissive(),
+                deptTime,
                 Float.parseFloat( firstClassCostField.getText().trim() ),
                 Float.parseFloat( coachCostField.getText().trim() ),
                 Float.parseFloat( economyCostField.getText().trim() )
