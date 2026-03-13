@@ -8,51 +8,145 @@ classDiagram
     MainPanel --> AdminPanel
     MainPanel --> PassengerPanel
 
-    Route --> Flight
-    Plane --> Flight
+    AdminPanel --> PlanesPanel
+    AdminPanel --> RoutesPanel
+    AdminPanel --> FlightsPanel
 
-    Ticket <-- Passenger
-    Ticket <-- Flight
+    PassengerPanel --> MyTicketsPanel
+    PassengerPanel --> BookFlightPanel
+
+    Flight --> Route
+    Flight --> Plane
+
+    Ticket --> Passenger
+    Ticket --> Flight
 
     Ticket <|-- FirstClass
     Ticket <|-- Coach
     Ticket <|-- Economy
 
     class App {
-
+        + «static» main( args : String[] )
     }
 
     class Database {
-        - instance : Database
+        - «static» instance : Database
         - conn : Connection
-        - path : String
-        + getInstance()
-        + getConnection()
+        - «static» path : String
+        - constructor()
+        - initialize()
+        + «static» getInstance()
+        + «static» getConnection()
         + seed()
-        - dropTable( tableName )
-        - createTables();
-
-    }
-
-    class MainPanel {
-    
+        - dropTable()
+        - createTables()
     }
 
     class AdminPanel {
+        + constructor()
+    }
+
+    class BookFlightPanel {
+        - table : JTable
+        - tableModel : DefaultTableModel
+        - typeDropdown : JComboBox~TicketType~
+        - fromDropdown : JComboBox~String~
+        - toDropdown : JComboBox~String~
+        - dateFromPicker : DatePicker
+        - dateToPicker : DatePicker
+        - JButton : bookButton
+        - passenger : Passenger
+        + constructor()
+        - buildTablePanel() JPanel
+        - buildBookPanel() JPanel
+        - buildFilterPanel() JPanel
+        - formatCapacity() String
+        + refresh()
+        - containsItem() boolean
+        - bookFlight()
+        + setPassenger()
+    }
+
+    class FlightsPanel {
+        - tableModel : DefaultTableModel
+        - routeDropdown : JComboBox~Route~
+        - planeDropdown : JComboBox~Plane~
+        - deptDatePicker : DatePicker
+        - deptTimeSpinner : JSpinner
+        - firstClassCostField : JTextField
+        - coachCostField : JTextField
+        - economyCostField : JTextField
+        - table : JTable
+        + constructor()
+        - buildFormPanel() JPanel
+        - buildTablePanel() JPanel
+        - refresh() void
+    }
+
+    class MainPanel {
+        + constructor()
+    }
+
+    class MyTicketsPanel {
+        - table : JTable
+        - tableModel : DefaultTableModel
+        - currentPassenger : Passenger
+        - passengerPanel: PassengerPanel
+        + constructor()
+        - buildTablePanel() JPanel
+        - buildButtonPanel() JPanel
+        - confirmTicket()
+        - cancelTicket()
+        - refresh()
+    }
+
+    class RoutesPanel {
+        - tableModel : DefaultTableModel
+        - fromField : JTextField
+        - toField : JTextField
+        - distanceField :  JTextField
+        - table :  JTable
+        + constructor()
+        - buildFormPanel() JPanel
+        - buildTablePanel() JPanel
+        - refresh()
 
     }
 
-    class PassengerPanel {
+    class PlanesPanel {
+        - tableModel : DefaultTableModel
+        - tailNumberField : JTextField
+        - speedField : JTextField
+        - firstClassField : JTextField
+        - coachField : JTextField
+        - economyField : JTextField
+        + constructor()
+        - buildFormPanel() JPanel
+        - buildTablePanel() JPanel
+        - refresh()
+    }
 
+    class PassengerPanel {
+        - passengerDropdown : JComboBox~Passenger~
+        - myTicketsPanel : MyTicketsPanel
+        - bookFlightPanel : BookFlightPanel
+        + PassengerPanel()
+        + refreshPassengers()
     }
 
     class Passenger {
         - passengerID : int
         - name : String
-        - money : double
+        - money : float
+        + constructor()
+        + constructor()
         + save()
-        + getID()
-        + updateMoney()
+        + getID() int
+        + updateMoney() boolean
+        + getName() String
+        + «static» getAll() ArrayList~Passenger~
+        + «static» getByID() Passenger
+        + toString() String
     }
 
     class Plane {
@@ -61,25 +155,45 @@ classDiagram
         - firstClassSeats : int
         - coachSeats : int
         - economySeats : int
+        + constructor()
+        + constructor()
         + save()
-        + getID()
-        + getSpeed()
-        + getSeats( TicketType type )
+        + getID() int
+        + getSpeed() int
+        + getSeats() int
+        + toString() String
+        + «static» getByID() Plane
+        + «static» getAll() ArrayList~Plane~
+        + remove() String
     }
 
     class Ticket {
-        <<abstract>>
+        «abstract»
         - ticketID : int
         - status : TicketStatus
         - flight : Flight
         - passenger : Passenger
         - type : TicketType
-        +save()
-        +getID()
-        +daysTillFlight()
-        +getPrice()
-        +cancel()
-        +update()
+        + constructor()
+        + constructor()
+        + getRefund()*
+        + save()
+        + getID() int
+        + getRoute() String
+        + getDeptTime() LocalDateTime
+        + getType() TicketType
+        + getStatus() TicketStatus
+        + daysTillFlight() int
+        + getPrice() float
+        + cancel() String
+        + confirm() String
+        + update() boolean
+        + getAlert() String
+        + «static» getAll() ArrayList~Ticket~
+        + «static» getForPassenger() ArrayList~Ticket~
+        + «static» getByID() Ticket
+        + «static» getCount() int
+        + «static» book() String
     }
 
     class Flight {
@@ -91,30 +205,58 @@ classDiagram
         - firstClassCost : float
         - coachCost : float
         - economyCost : float
-        +getDeparture()
-        +seatsFree()
+        + constructor()
+        + constructor()
+        + save()
+        + getID() int
+        + getDeptTime() LocalDateTime
+        + getArriveTime() LocalDateTime
+        + getRoute() String
+        + getFromAirport() String
+        + getToAirport() String
+        + getTailNumber() String
+        + getCapacity() CapacityStatus
+        + «static» getByID() Flight
+        + «static» getAll() ArrayList<Flight>
+        + remove() String
+        + getDeparture()
+        + seatsFree()
     }
 
     class Route {
-        - RouteID : int
+        - routeID : int
         - fromAirport : String
         - toAirport : String
         - distance : int
+        + constructor()
+        + constructor()
         + save()
-        + getID()
-        + getDistance()
+        + getID() int
+        + getDistance() int
+        + getFromAirport() : String
+        + getToAirport() : String
+        + toString() String
+        + «static» getByID() Route
+        + «static» getAll() ArrayList~Route~
+        + remove() String
     }
 
     class FirstClass {
-        getRefund()
+        + constructor()
+        + constructor()
+        + getRefund() float
     }
 
     class Coach {
-        getRefund()
+        + constructor()
+        + constructor()
+        + getRefund() float
     }
 
     class Economy {
-        getRefund()
+        + constructor()
+        + constructor()
+        + getRefund() float
     }
 
 ```
