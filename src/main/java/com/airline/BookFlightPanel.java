@@ -147,7 +147,7 @@ public class BookFlightPanel extends JPanel {
             if ( !containsItem( toDropdown, to ) ) toDropdown.addItem( to );
         }
 
-        // Restore selections
+        // Set selection options
         fromDropdown.setSelectedItem( selectedFrom );
         toDropdown.setSelectedItem( selectedTo );
 

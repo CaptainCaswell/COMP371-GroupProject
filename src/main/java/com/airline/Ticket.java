@@ -106,17 +106,19 @@ public abstract class Ticket {
         return flight.getPrice( type );
     }
 
-    public void cancel() {
-        // Check if ticket has been paid
+    public String cancel() {
+        if ( status == TicketStatus.CANCELLED ) {
+            return "This ticket has already been canceled.";
+        }
+        
         float refund = 0;
 
-        System.out.println( "DEBUG: canceling" );
-
+        // Check if ticket has been paid
         if ( status == TicketStatus.CONFIRMED ) {
             refund = getRefund();
-            System.out.println( "DEBUG: refund = " + refund );
         }
 
+        // Update object status
         this.status = TicketStatus.CANCELLED;
 
         // Update money if there was a refund
@@ -124,43 +126,37 @@ public abstract class Ticket {
             passenger.updateMoney( refund );
         }
 
-        System.out.println( "DEBUG: updating" );
-
-        update();
-    }
-
-    public String confirm() {
-        // Errors if not BOOKED
-        if ( status == TicketStatus.CONFIRMED ) {
-            return "Ticket already confirmed.";
-        }
-
-        if ( status == TicketStatus.CANCELLED ) {
-            return "Cannot confirm cancelled tickets.";
-        }
-
-        // Check availability
-        if ( flight.getCapacity( type ) == CapacityStatus.FULL ) {
-            return "Flight already full.";
-        }
-
-        // Charge passenger
-        if ( !passenger.updateMoney( flight.getPrice( type ) * -1 ) ) {
-            return "Insufficient funds.";
-        }
-
-        // Change status
-        this.status = TicketStatus.CONFIRMED;
-
         // Update database
-        if ( !update() ) {
-            return "Unable to confirm ticket.";
-        }
-
-        // Remove 
+        update();
 
         return null;
     }
+
+public String confirm() {
+    // Errors if not BOOKED
+    if ( status == TicketStatus.CONFIRMED )
+        return "Ticket already confirmed.";
+
+    if ( status == TicketStatus.CANCELLED )
+        return "Cannot confirm cancelled tickets.";
+
+    // Check availability
+    if ( flight.getCapacity( type ) == CapacityStatus.FULL )
+        return "Flight already full.";
+
+    // Charge passenger
+    if ( !passenger.updateMoney( flight.getPrice( type ) * -1 ) )
+        return "Insufficient funds.";
+
+    // Change status
+    this.status = TicketStatus.CONFIRMED;
+
+    // Update database
+    if ( !update() )
+        return "Unable to confirm ticket.";
+
+    return null;
+}
 
     public boolean update() {
         // Update database

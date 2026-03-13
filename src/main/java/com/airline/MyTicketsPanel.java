@@ -76,20 +76,25 @@ public class MyTicketsPanel extends JPanel {
     }
 
     private void cancelTicket() {
-    int selectedRow = table.getSelectedRow();
-    int ticketID = (int) tableModel.getValueAt( selectedRow, 0 );
+        int selectedRow = table.getSelectedRow();
+        int ticketID = (int) tableModel.getValueAt( selectedRow, 0 );
 
-    if ( selectedRow == -1 ) {
-        JOptionPane.showMessageDialog( this, "Please select a ticket.", "No Ticket Selected", JOptionPane.WARNING_MESSAGE );
-        return;
+        if ( selectedRow == -1 ) {
+            JOptionPane.showMessageDialog( this, "Please select a ticket.", "No Ticket Selected", JOptionPane.WARNING_MESSAGE );
+            return;
+        }
+
+        Ticket ticket = Ticket.getByID( ticketID );
+        String error = ticket.cancel();
+
+        if (error == null ) {
+            JOptionPane.showMessageDialog( this, "Selected Ticket has been canceled.", "Ticket Cancelled", JOptionPane.INFORMATION_MESSAGE );
+            refresh( currentPassenger );
+            passengerPanel.refreshPassengers();
+        } else {
+            JOptionPane.showMessageDialog( this, error, "Ticket Cancelled", JOptionPane.INFORMATION_MESSAGE );
+        }
     }
-
-    Ticket ticket = Ticket.getByID( ticketID );
-    ticket.cancel();
-    JOptionPane.showMessageDialog( this, "Selected Ticket has been canceled.", "Ticket Cancelled", JOptionPane.INFORMATION_MESSAGE );
-    refresh( currentPassenger );
-    passengerPanel.refreshPassengers();
-}
 
     public void refresh( Passenger passenger ) {
         currentPassenger = passenger;
