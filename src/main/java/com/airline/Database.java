@@ -16,13 +16,29 @@ public class Database {
         try {
             conn = DriverManager.getConnection( path );
             if ( conn != null ) {
-                System.out.println( "Connected to SQLite successfully!" );
+                initialize();
             }
         }
 
         // DB Connect failed
         catch ( SQLException e ) {
             System.out.println( "Connection failed: " + e.getMessage() );
+        }
+    }
+
+    private void initialize() {
+        // Create tables if they don't exist
+        try {
+            Statement stmt = conn.createStatement();
+
+            stmt.execute( "CREATE TABLE IF NOT EXISTS Routes (routeID INTEGER PRIMARY KEY AUTOINCREMENT, fromAirport TEXT, toAirport TEXT, distance INTEGER)" );
+            stmt.execute( "CREATE TABLE IF NOT EXISTS Planes (tailNumber TEXT PRIMARY KEY, speed INTEGER, firstClassSeats INTEGER, coachSeats INTEGER, economySeats INTEGER)" );
+            stmt.execute( "CREATE TABLE IF NOT EXISTS Flights (flightID INTEGER PRIMARY KEY AUTOINCREMENT, routeID INTEGER, tailNumber TEXT, deptTime TEXT, arriveTime TEXT, firstClassCost REAL, coachCost REAL, economyCost REAL, FOREIGN KEY(routeID) REFERENCES Routes(routeID), FOREIGN KEY(tailNumber) REFERENCES Planes(tailNumber))" );
+            stmt.execute( "CREATE TABLE IF NOT EXISTS Passengers (passengerID INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, money REAL)" );
+            stmt.execute( "CREATE TABLE IF NOT EXISTS Tickets (ticketID INTEGER PRIMARY KEY AUTOINCREMENT, flightID INTEGER, passengerID INTEGER, status TEXT, type TEXT, FOREIGN KEY(flightID) REFERENCES Flights(flightID), FOREIGN KEY(passengerID) REFERENCES Passengers(passengerID))" );
+
+        } catch ( Exception e ) {
+            System.out.println( "Error initializing tables: " + e );
         }
     }
 
@@ -80,9 +96,6 @@ public class Database {
         new CoachTicket( f5, carol );
         new EconomyTicket( f6, ryan );
         new CoachTicket( f1, alice );
-
-        System.out.println( "Done\n" );
-
     }
 
     private void dropTable( String tableName ) {
