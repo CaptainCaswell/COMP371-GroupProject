@@ -3,8 +3,6 @@ package com.airline;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import com.airline.Ticket.TicketStatus;
-
 import java.util.ArrayList;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;

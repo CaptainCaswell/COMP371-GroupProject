@@ -93,7 +93,10 @@ public class BookFlightPanel extends JPanel {
         clearButton.addActionListener( e -> {
             fromDropdown.setSelectedIndex( 0 );
             toDropdown.setSelectedIndex( 0 );
-            // TODO Pickers
+            
+            dateFromPicker.clear();
+            dateToPicker.clear();
+
             refresh();
         });
 
@@ -140,7 +143,7 @@ public class BookFlightPanel extends JPanel {
             String from = flight.getFromAirport();
             String to = flight.getToAirport();
 
-            if ( !containsItem( fromDropdown, from ) ) fromDropdown.addItem( from ); // TODO Needed?
+            if ( !containsItem( fromDropdown, from ) ) fromDropdown.addItem( from );
             if ( !containsItem( toDropdown, to ) ) toDropdown.addItem( to );
         }
 
@@ -168,7 +171,7 @@ public class BookFlightPanel extends JPanel {
                 flight.getID(),
                 flight.getRoute(),
                 flight.getDeptTime(),
-                flight.getDeptTime(), //TODO Make arrival time
+                flight.getArriveTime(),
                 formatCapacity( flight.getCapacity( TicketType.FIRST ), flight.getPrice( TicketType.FIRST ) ),
                 formatCapacity( flight.getCapacity( TicketType.COACH ), flight.getPrice( TicketType.COACH ) ),
                 formatCapacity( flight.getCapacity( TicketType.ECONOMY ), flight.getPrice( TicketType.ECONOMY ) )

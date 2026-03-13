@@ -3,7 +3,6 @@ package com.airline;
 import javax.swing.*;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
-import java.util.ArrayList;
 
 public class PassengerPanel extends JPanel {
     private JComboBox<Passenger> passengerDropdown;

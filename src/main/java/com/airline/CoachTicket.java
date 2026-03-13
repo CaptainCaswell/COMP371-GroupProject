@@ -13,7 +13,7 @@ public class CoachTicket extends Ticket {
     }
 
     public float getRefund() {
-        // TODO Calculate
+        // Calculate
         float refund = getPrice();
 
         return refund;

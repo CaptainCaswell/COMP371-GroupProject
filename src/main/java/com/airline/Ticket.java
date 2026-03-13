@@ -9,7 +9,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 
 import com.airline.Flight.CapacityStatus;
-import com.airline.Ticket.TicketStatus;
 
 public abstract class Ticket {
     private int ticketID;
@@ -156,7 +155,6 @@ public abstract class Ticket {
         // Update database
         if ( !update() ) {
             return "Unable to confirm ticket.";
-            // TODO Reload from database?
         }
 
         // Remove 

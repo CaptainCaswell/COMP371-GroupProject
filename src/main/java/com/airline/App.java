@@ -6,7 +6,7 @@ public class App {
     public static void main( String[] args ) {
         Database database = Database.getInstance();
         
-        // TODO Keep this? Button in UI?
+        // TODO Keep automatic seed? Button in UI?
         database.seed();
 
         SwingUtilities.invokeLater( () -> {
