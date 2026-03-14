@@ -13,8 +13,11 @@ public class EconomyTicket extends Ticket {
     }
 
     public float getRefund() {
-        // Calculate
-        float refund = getPrice();
+        // 14 days min 70%
+
+        if ( daysTillFlight() < 14 ) return 0;
+
+        float refund = getPrice() * 0.70f;
 
         return refund;
     }

@@ -13,7 +13,7 @@ public class FirstClassTicket extends Ticket {
     }
 
     public float getRefund() {
-        // Always full refund
+        // Always 100%
         float refund = getPrice();
 
         return refund;

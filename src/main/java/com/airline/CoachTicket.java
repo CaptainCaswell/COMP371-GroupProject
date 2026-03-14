@@ -13,8 +13,8 @@ public class CoachTicket extends Ticket {
     }
 
     public float getRefund() {
-        // Calculate
-        float refund = getPrice();
+        // Always 85%
+        float refund = getPrice() * 0.85f;
 
         return refund;
     }
