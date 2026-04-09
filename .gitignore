@@ -7,3 +7,6 @@ launch.json
 
 # Maven
 target/
+
+.idea/
+*.iml
